@@ -5,11 +5,23 @@ import os
 import urllib.parse
 from pathlib import Path
 from pymongo import MongoClient
+from dotenv import load_dotenv  # You may need to run 'pip install python-dotenv'
 
-# 1. MongoDB Setup
-password = "DhT3CkFozsyoMd1m" 
-encoded_password = urllib.parse.quote_plus(password)
-MONGO_URI = f"mongodb+srv://thatomatlali_db_user:{encoded_password}@quickcart.ndxjnxk.mongodb.net/?appName=quickcart"
+# 1. Load Secrets from .env file
+load_dotenv()
+
+# Get credentials from environment variables instead of hardcoding
+db_user = os.getenv("MONGO_USER", "thatomatlali_db_user")
+db_pass = os.getenv("MONGO_PASSWORD") # This stays hidden!
+
+if not db_pass:
+    print("⚠️ Warning: MONGO_PASSWORD not found in environment variables.")
+
+# 2. MongoDB Setup with Encoded Password
+encoded_password = urllib.parse.quote_plus(db_pass) if db_pass else ""
+MONGO_URI = f"mongodb+srv://{db_user}:{encoded_password}@quickcart.ndxjnxk.mongodb.net/?appName=quickcart"
+
+# Rest of your script follows...
 
 # Use a timeout so it doesn't hang your terminal
 client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
